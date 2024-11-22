@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  shoopeer-db: 
+    image: bitnami/postgresql
+    ports:
+      - 5432/5432
+    enviroment:
+      - POSTGRESQL_USERNAME=docker
+      - POSTGRESQL_PASSWORD=docker
+      - POSTGRESQL_DATABASE=shopper
+    volumes:
+      - db_data:/bitnami/postgresql/data
+  
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=postgres://docker:docker@db:5432/shopperapi 
+    depends_on:
+      - db
+  
+  frontend:
+    image: your-frontend-image  # Substitua com a imagem do seu frontend
+    ports:
+      - "80:80"  # Expondo a porta 80 do frontend
+    depends_on:
+      - api  # Garante que o backend (API) inicie primeiro
