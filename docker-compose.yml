@@ -1,11 +1,11 @@
 version: '3'
 
 services:
-  shoopeer-db: 
+  db: 
     image: bitnami/postgresql
     ports:
-      - 5432/5432
-    enviroment:
+      - 5432:5432
+    environment:  
       - POSTGRESQL_USERNAME=docker
       - POSTGRESQL_PASSWORD=docker
       - POSTGRESQL_DATABASE=shopper
@@ -16,15 +16,24 @@ services:
     build:
       context: ./backend
     ports:
-      - "8080:8080"
-    environment:
-      - DATABASE_URL=postgres://docker:docker@db:5432/shopperapi 
+      - "8080:8080"   # Porta do backend
     depends_on:
       - db
-  
+    environment:
+      - DATABASE_URL=postgresql://docker:docker@db:5432/shopper
+
   frontend:
-    image: your-frontend-image  # Substitua com a imagem do seu frontend
+    image: node:18
+    working_dir: /app
+    volumes:
+      - ./frontend:/app  # Isso monta o diretório local 'frontend' no contêiner
     ports:
-      - "80:80"  # Expondo a porta 80 do frontend
+      - "80:80"  # A aplicação vai rodar na porta 3000
+    environment:
+      - NODE_OPTIONS=--openssl-legacy-provider
+    command: npm start  # Roda o servidor de desenvolvimento do React
     depends_on:
-      - api  # Garante que o backend (API) inicie primeiro
+      - backend
+
+volumes:
+  db_data: {}
