@@ -1,14 +1,20 @@
-FROM node:16
+# Base image para Node.js
+FROM node:18-alpine
 
-
+# Diretório de trabalho no container
 WORKDIR /app
 
-COPY . .
+# Copia os arquivos de dependências
+COPY package*.json ./
 
+# Instala dependências
 RUN npm install
 
+# Copia o código restante
 COPY . .
 
-EXPOSE 8080
+# Porta que será exposta
+EXPOSE 4000
 
-CMD ["npm", "start"]
+# Comando para iniciar o backend
+CMD ["npm", "run", "dev"]

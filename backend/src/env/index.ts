@@ -2,7 +2,10 @@ import 'dotenv/config'
 import { z } from 'zod'
 
 const envSchema = z.object({
-    PORT: z.coerce.number().default(3333),
+    DIRECT_URL: z.string(),
+    DATABASE_URL: z.string(),
+    GOOGLE_API_KEY: z.string(),
+    PORT: z.coerce.number().default(8080),
     NODE_ENV: z.enum(['dev', 'test', 'production']).default('dev'),
 })
 

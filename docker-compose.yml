@@ -1,39 +1,18 @@
-version: '3'
-
 services:
-  db: 
-    image: bitnami/postgresql
-    ports:
-      - 5432:5432
-    environment:  
-      - POSTGRESQL_USERNAME=docker
-      - POSTGRESQL_PASSWORD=docker
-      - POSTGRESQL_DATABASE=shopper
-    volumes:
-      - db_data:/bitnami/postgresql/data
-  
   backend:
     build:
       context: ./backend
     ports:
-      - "8080:8080"   # Porta do backend
-    depends_on:
-      - db
+      - "8080:8080"
     environment:
-      - DATABASE_URL=postgresql://docker:docker@db:5432/shopper
-
+      - NODE_ENV=production
+      - SUPABASE_URL=https://eodebwmedqwhufzsvpko.supabase.co
+      - SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVvZGVid21lZHF3aHVzenN2cGtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI2NTI2MzcsImVxpCI6MjA0ODIyODYzN30.RkbgSmxYhTqVrjKTMgL8bbJGo1xNkG9pfKVZYDHG4uQ
   frontend:
-    image: node:18
-    working_dir: /app
-    volumes:
-      - ./frontend:/app  # Isso monta o diretório local 'frontend' no contêiner
+    build:
+      context: ./frontend
     ports:
-      - "80:80"  # A aplicação vai rodar na porta 3000
-    environment:
-      - NODE_OPTIONS=--openssl-legacy-provider
-    command: npm start  # Roda o servidor de desenvolvimento do React
+      - "80:3000"
     depends_on:
       - backend
-
-volumes:
-  db_data: {}
+    command: wait-for-it backend:8080/health --timeout=120 -- npm run dev

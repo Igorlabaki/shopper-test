@@ -5,10 +5,57 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Custumer {
+  id   String @id @default(uuid())
+  name String @unique
+
+  rides Ride[]
+
+  Review Review[]
+}
+
+model Driver {
+  id          String @id @default(uuid())
+  avatarUrl   String
+  name        String @unique
+  description String
+  tax         Float
+  minKm       Float
+  car         String
+
+  rides   Ride[]
+  reviews Review[]
+}
+
+model Ride {
+  id          String   @id @default(uuid())
+  custumerId  String
+  custumer    Custumer @relation(fields: [custumerId], references: [id], onDelete: Cascade)
+  driverId    String
+  driver      Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  origin      String
+  destination String
+  distance    Float
+  duration    String
+  value       Float
+}
+
+model Review {
+  id         String   @id @default(uuid())
+  driverId   String
+  driver     Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  custumerId String
+  custumer   Custumer @relation(fields: [custumerId], references: [id], onDelete: Cascade)
+  comment    String
+  rating     Float
 }

@@ -1,18 +1,23 @@
-# Use a imagem do Node.js
+# Imagem base
 FROM node:18
 
-# Defina o diretório de trabalho
-WORKDIR /app
+# Diretório de trabalho no container
+WORKDIR /usr/src/app
 
-# Instale as dependências
-COPY package.json package-lock.json ./
+# Copiar os arquivos do projeto para o container
+COPY package*.json ./
+
+# Instalar as dependências
 RUN npm install
 
-# Copie o código do frontend
+# Copiar o restante do código
 COPY . .
 
-# Exponha a porta que o React vai rodar
-EXPOSE 80
+# Construir a aplicação Next.js (opcional se já estiver no diretório de build)
+RUN npm run build
 
-# Rodar o servidor de desenvolvimento React (que vai rodar com hot-reloading)
-CMD ["npm", "start"]
+# Expor a porta 3000 (padrão do Next.js)
+EXPOSE 3000
+
+# Comando para iniciar a aplicação Next.js
+CMD wait-for-it backend:8080 -- npm run dev
